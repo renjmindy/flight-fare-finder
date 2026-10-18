@@ -9,4 +9,4 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Auth uses Lovable Cloud default users only (no profiles table); protected pages live under src/routes/_authenticated/ — keeps v1 portable to a user-owned backend later.
+- Auth uses Lovable Cloud default users only (no profiles table); protected pages are nested under the ProtectedRoute in src/App.tsx — keeps v1 portable to a user-owned backend later.

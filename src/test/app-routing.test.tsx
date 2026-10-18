@@ -1,17 +1,34 @@
-import { QueryClient } from "@tanstack/react-query";
-import { createRouter, rootRouteId } from "@tanstack/react-router";
+import { render, screen } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 
-import { routeTree } from "@/routeTree.gen";
+import App from "@/App";
 
-// Match routes without running loaders or rendering: loaders may need a server or
-// network the test run lacks, and jsdom never loads the stylesheets React waits on.
+function renderAt(path: string) {
+  return render(
+    <QueryClientProvider client={new QueryClient()}>
+      <MemoryRouter initialEntries={[path]}>
+        <App />
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+}
+
 describe("App routing", () => {
-  it("matches a page for / instead of falling back to not found", () => {
-    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+  it("renders the landing page for /", () => {
+    renderAt("/");
+    expect(screen.queryByText("Page not found")).not.toBeInTheDocument();
+    expect(screen.getAllByText("Flight Price Notifier").length).toBeGreaterThan(0);
+  });
 
-    const matches = router.matchRoutes("/");
+  it("renders the sign-in and sign-up forms", () => {
+    renderAt("/signin");
+    expect(screen.getByRole("heading", { name: /Sign in/ })).toBeInTheDocument();
+  });
 
-    expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
+  it("falls back to not found for unknown paths", () => {
+    renderAt("/nope");
+    expect(screen.getByText("Page not found")).toBeInTheDocument();
   });
 });
