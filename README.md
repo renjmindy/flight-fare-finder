@@ -12,7 +12,7 @@ Card 1: 「盯緊熱門航線 (Always-on route watching)」 — 持續監控台�
 Card 2: 「達標自動通知 (Target-price email alerts)」 — 低於你設定的目標價，就寄 email 提醒你，附上立即訂購連結。
 Card 3: 「隨時取消 (Cancel anytime)」 — 月訂閱制，不想用隨時停，沒有綁約。
 Footer with copyright 「© 2026 Flight Price Notifier」.
-Authentication using Lovable's built-in Supabase-style auth (use whatever auth backend Lovable provides by default — Lovable Cloud is fine for this v1; we'll swap to a user-owned Supabase project in a later step):
+Authentication using Supabase Auth (email + password):
 
 Sign Up page with email + password
 Sign In page with email + password
@@ -31,15 +31,6 @@ Mobile responsive
 Tasteful subtle animations (fade-in on scroll is fine; don't overdo it)
 Out of scope for this v1: route-subscription form, target-price input, fare display, payment, custom database tables (do NOT create a subscriptions or profiles table — only use Supabase's default auth.users). Those come in later milestones. Stick to landing page + auth + placeholder dashboard.
 
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/2ada4265-e210-4590-a8e7-c09d3ff8e913).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
 
 ## Development
 
@@ -59,4 +50,4 @@ Plain Vite + React single-page app with React Router (client-side routing). No S
 - `npm run dev` — local dev server
 - `npm run build` — static build to `dist/`
 - Deploy on Vercel: framework preset **Vite**, output `dist`. `vercel.json` rewrites all paths to `index.html` so deep links such as `/app` resolve client-side.
-- Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in the Vercel project's environment variables.
+- Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` (the same values as in `.env`) in the Vercel project's environment variables, then redeploy.
