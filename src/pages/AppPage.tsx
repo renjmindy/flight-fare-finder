@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { useAuthUser } from "@/components/ProtectedRoute";
+import { PlanCard } from "@/components/PlanCard";
+import { PLANS, listSubscriptions, saveSubscription, type PlanName } from "@/lib/flightApi";
 import { usePageMeta } from "@/lib/page-meta";
 
 export default function AppPage() {
@@ -16,6 +18,18 @@ export default function AppPage() {
   const user = useAuthUser();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const email = user.email ?? "";
+  const subs = useQuery({
+    queryKey: ["subscriptions", email],
+    queryFn: () => listSubscriptions(email),
+    enabled: email !== "",
+  });
+  const save = useMutation({
+    mutationFn: (v: { plan: PlanName; target: number }) =>
+      saveSubscription({ email, plan_name: v.plan, target_price: v.target }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["subscriptions", email] }),
+  });
 
   async function signOut() {
     await queryClient.cancelQueries();
@@ -39,11 +53,26 @@ export default function AppPage() {
       </header>
       <main className="mx-auto max-w-3xl px-4 py-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <h1 className="text-3xl font-bold tracking-tight break-all sm:text-4xl">Hi {user.email}</h1>
-        <div className="mt-8 rounded-2xl border bg-card p-8">
-          <p className="text-lg">你的航線追蹤儀表板即將上線 — 下一個里程碑會加上訂閱航線的功能。</p>
-          <p className="mt-3 text-muted-foreground">
-            Your dashboard is coming soon. Route-subscription will be added in the next milestone.
+        <p className="mt-3 text-muted-foreground">
+          選擇航線並設定目標價，降價就寄 email 通知你。 Pick a route and a target price — we email
+          you when the fare drops.
+        </p>
+        {subs.isError && (
+          <p className="mt-6 text-sm text-destructive">
+            無法載入訂閱 Couldn't load your subscriptions. Please refresh.
           </p>
+        )}
+        <div className="mt-8 grid gap-6 sm:grid-cols-2">
+          {PLANS.map((plan) => (
+            <PlanCard
+              key={plan.name}
+              plan={plan}
+              subscription={subs.data?.find((s) => s.route === plan.route)}
+              saving={save.isPending && save.variables?.plan === plan.name}
+              error={save.isError && save.variables?.plan === plan.name ? save.error.message : null}
+              onSave={(p, target) => save.mutate({ plan: p, target })}
+            />
+          ))}
         </div>
       </main>
     </div>
