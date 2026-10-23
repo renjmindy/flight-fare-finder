@@ -1,4 +1,4 @@
-export type PlanName = "tokyo" | "seoul";
+export type PlanName = "tokyo" | "seoul" | "sanfrancisco";
 
 export type Subscription = {
   email: string;
@@ -11,6 +11,7 @@ export type Subscription = {
 export const PLANS: { name: PlanName; route: string; label: string; placeholder: string }[] = [
   { name: "tokyo", route: "TPE-TYO", label: "台北 ✈ 東京", placeholder: "10000" },
   { name: "seoul", route: "TPE-SEL", label: "台北 ✈ 首爾", placeholder: "6000" },
+  { name: "sanfrancisco", route: "TPE-SFO", label: "台北 ✈ 舊金山", placeholder: "30000" },
 ];
 
 const API_URL = import.meta.env["VITE_FLIGHT_API_URL"] as string | undefined;
