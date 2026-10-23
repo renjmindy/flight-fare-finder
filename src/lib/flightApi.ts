@@ -1,11 +1,15 @@
+import { supabase } from "@/integrations/supabase/client";
+
 export type PlanName = "tokyo" | "seoul" | "sanfrancisco";
+export type SubscriptionStatus = "pending_payment" | "active" | "cancelled" | "expired";
 
 export type Subscription = {
-  email: string;
   route: string;
   plan_name: PlanName;
   target_price: number;
   currency: string;
+  subscription_status: SubscriptionStatus;
+  current_period_end_date?: string;
 };
 
 export const PLANS: { name: PlanName; route: string; label: string; placeholder: string }[] = [
@@ -21,25 +25,49 @@ function apiUrl(path: string) {
   return `${API_URL.replace(/\/+$/, "")}${path}`;
 }
 
-export async function listSubscriptions(email: string): Promise<Subscription[]> {
-  const res = await fetch(apiUrl(`/subscriptions?email=${encodeURIComponent(email)}`));
-  if (!res.ok) throw new Error(`Failed to load subscriptions (${res.status})`);
+async function authHeaders(): Promise<Record<string, string>> {
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  if (!token) throw new Error("Please sign in again");
+  return { Authorization: `Bearer ${token}` };
+}
+
+async function failure(res: Response, fallback: string): Promise<Error> {
+  const data = (await res.json().catch(() => ({}))) as { error?: string };
+  return new Error(data.error ?? `${fallback} (${res.status})`);
+}
+
+export async function listSubscriptions(): Promise<Subscription[]> {
+  const res = await fetch(apiUrl("/subscriptions"), { headers: await authHeaders() });
+  if (!res.ok) throw await failure(res, "Failed to load subscriptions");
   const data = (await res.json()) as { subscriptions: Subscription[] };
   return data.subscriptions;
 }
 
+export type SaveResult = { kind: "checkout"; html: string } | { kind: "updated" };
+
 export async function saveSubscription(input: {
-  email: string;
   plan_name: PlanName;
   target_price: number;
-}): Promise<void> {
+}): Promise<SaveResult> {
   const res = await fetch(apiUrl("/subscribe"), {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "application/json", ...(await authHeaders()) },
     body: JSON.stringify(input),
   });
-  if (!res.ok) {
-    const data = (await res.json().catch(() => ({}))) as { error?: string };
-    throw new Error(data.error ?? `Request failed (${res.status})`);
+  if (!res.ok) throw await failure(res, "Request failed");
+  // text/html = hand the browser to ECPay's cashier; JSON = in-place update (no payment)
+  if ((res.headers.get("content-type") ?? "").includes("text/html")) {
+    return { kind: "checkout", html: await res.text() };
   }
+  return { kind: "updated" };
+}
+
+export async function cancelSubscription(route: string): Promise<void> {
+  const res = await fetch(apiUrl("/cancel"), {
+    method: "POST",
+    headers: { "content-type": "application/json", ...(await authHeaders()) },
+    body: JSON.stringify({ route }),
+  });
+  if (!res.ok) throw await failure(res, "Cancel failed");
 }
