@@ -35,32 +35,39 @@
 
 :root {
   --radius: 0.75rem;
-  --background: oklch(0.13 0.012 290);
-  --foreground: oklch(0.97 0.005 290);
-  --card: oklch(0.18 0.018 290);
-  --card-foreground: oklch(0.97 0.005 290);
-  --popover: oklch(0.18 0.018 290);
-  --popover-foreground: oklch(0.97 0.005 290);
-  --primary: oklch(0.62 0.22 295);
-  --primary-foreground: oklch(0.99 0 0);
-  --primary-glow: oklch(0.72 0.18 310);
-  --secondary: oklch(0.23 0.02 290);
-  --secondary-foreground: oklch(0.97 0.005 290);
-  --muted: oklch(0.23 0.02 290);
-  --muted-foreground: oklch(0.7 0.02 290);
-  --accent: oklch(0.26 0.04 295);
-  --accent-foreground: oklch(0.97 0.005 290);
-  --destructive: oklch(0.65 0.2 25);
+  /* Midnight-navy sea & gold constellations */
+  --background: oklch(0.16 0.05 265);
+  --foreground: oklch(0.96 0.012 250);
+  --card: oklch(0.21 0.06 262);
+  --card-foreground: oklch(0.96 0.012 250);
+  --popover: oklch(0.21 0.06 262);
+  --popover-foreground: oklch(0.96 0.012 250);
+  --primary: oklch(0.8 0.12 82);
+  --primary-foreground: oklch(0.18 0.05 265);
+  --primary-glow: oklch(0.88 0.1 88);
+  --secondary: oklch(0.26 0.07 260);
+  --secondary-foreground: oklch(0.96 0.012 250);
+  --muted: oklch(0.26 0.06 260);
+  --muted-foreground: oklch(0.74 0.05 250);
+  --accent: oklch(0.29 0.08 258);
+  --accent-foreground: oklch(0.96 0.012 250);
+  --destructive: oklch(0.68 0.2 25);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.62 0.22 295);
+  --border: oklch(0.8 0.08 250 / 16%);
+  --input: oklch(0.8 0.08 250 / 20%);
+  --ring: oklch(0.8 0.12 82);
   --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-glow));
-  --glow: radial-gradient(60% 50% at 50% 0%, oklch(0.62 0.22 295 / 0.35), transparent 70%);
+  --glow:
+    radial-gradient(60% 50% at 50% 0%, oklch(0.55 0.15 258 / 0.4), transparent 70%),
+    radial-gradient(40% 35% at 78% 12%, oklch(0.8 0.12 82 / 0.14), transparent 70%);
+  --painting:
+    linear-gradient(to bottom, oklch(0.16 0.05 265 / 0.55), oklch(0.16 0.05 265 / 0.9) 85%),
+    url("/hero-night-sea.jpg");
 }
 
 @layer base {
   * { border-color: var(--color-border); }
+  html { color-scheme: dark; }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -71,6 +78,12 @@
 
 @utility bg-gradient-primary { background-image: var(--gradient-primary); }
 @utility bg-glow { background-image: var(--glow); }
+@utility bg-painting {
+  background-image: var(--painting);
+  background-size: cover;
+  background-position: center;
+  mask-image: linear-gradient(to bottom, black 70%, transparent);
+}
 @utility text-gradient {
   background-image: var(--gradient-primary);
   -webkit-background-clip: text;

@@ -40,6 +40,7 @@ export default function Index() {
 
       <main className="flex-1">
         <section className="relative overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 bg-painting" />
           <div className="pointer-events-none absolute inset-0 bg-glow" />
           <div className="relative mx-auto max-w-4xl px-4 py-24 text-center sm:py-32">
             <Reveal>

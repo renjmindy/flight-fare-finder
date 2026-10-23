@@ -30,6 +30,7 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
 
   return (
     <div className="relative grid min-h-screen place-items-center px-4">
+      <div className="pointer-events-none absolute inset-0 bg-painting" />
       <div className="pointer-events-none absolute inset-0 bg-glow" />
       <div className="relative w-full max-w-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="mb-8 flex justify-center"><Logo /></div>
